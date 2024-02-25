@@ -5,3 +5,7 @@
 ## 文件结构
 
 - 'dp': 动态规划算法实例
+
+## 参考资料
+
+- [Hands-on-RL](https://github.com/boyu-ai/Hands-on-RL)

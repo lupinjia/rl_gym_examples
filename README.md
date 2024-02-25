@@ -5,4 +5,7 @@ This repository contains examples of Reinforcement Learning algorithms implement
 ## File Structure
 
 - 'dp': Dynamic Programming examples
-- 
+
+## References
+
+- [Hands-on-RL](https://github.com/boyu-ai/Hands-on-RL)
