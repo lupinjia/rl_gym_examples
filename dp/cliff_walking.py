@@ -1,6 +1,9 @@
+import sys
+
 from env.cliff_walking_env import CliffWalkingEnv
 from alg.policy_iteration import PolicyIteration
-
+from alg.value_iteration import ValueIteration
+from utils.arg import parse_args
 
 def print_agent(agent, action_meaning, disaster=[], end=[]):
     print("State Value: ")
@@ -27,16 +30,21 @@ def print_agent(agent, action_meaning, disaster=[], end=[]):
                 print(pi_str, end=' ')
         print()
 
-def main():
+def main(argv):
     
     env = CliffWalkingEnv()
     action_meaning = ['^', 'v', '<', '>']
     theta = 0.001
     gamma = 0.9
-    agent = PolicyIteration(env, theta, gamma)
-    agent.policy_iteration()
+    is_policy_iteration = parse_args(argv)
+    if is_policy_iteration:
+        agent = PolicyIteration(env, theta, gamma)
+        agent.policy_iteration()
+    else:
+        agent = ValueIteration(env, theta, gamma)
+        agent.value_iteration()
     print_agent(agent, action_meaning, list(range(37, 47)), [47])
     
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

@@ -9,14 +9,14 @@ class PolicyIteration:
     def __init__(self, env, theta, gamma):
         self.env = env
         if hasattr(self.env, 'ncol') and hasattr(self.env, 'nrow'): # self-defined cliff walking env
-            self.num_states = self.env.ncol * self.env.nrow  # 状态数
+            self.num_obs = self.env.ncol * self.env.nrow  # 状态数
             self.num_actions = len(self.env.action_space)
         else: # openai gym env
-            self.num_states = self.env.observation_space.n  # 状态数
+            self.num_obs = self.env.observation_space.n  # 状态数
             self.num_actions = self.env.action_space.n
-        self.v = [0] * self.num_states  # 价值函数初始化为0
+        self.v = [0] * self.num_obs  # 价值函数初始化为0
         self.pi = [[1 / self.num_actions] * self.num_actions
-                       for i in range(self.num_states)]  # 初始化为均匀随机策略
+                       for i in range(self.num_obs)]  # 初始化为均匀随机策略
         self.theta = theta  # 策略评估收敛阈值
         self.gamma = gamma  # 折扣因子
 
@@ -32,8 +32,8 @@ class PolicyIteration:
         cnt = 1  # 计数器
         while 1:
             max_diff = 0
-            new_v = [0] * self.num_states  # 新价值函数
-            for s in range(self.num_states):
+            new_v = [0] * self.num_obs  # 新价值函数
+            for s in range(self.num_obs):
                 qsa_list = []  # 开始计算状态s下的所有Q(s,a)价值
                 for a in range(4):
                     qsa = 0
@@ -62,7 +62,7 @@ class PolicyIteration:
         
         优化策略的方法是直接让动作价值函数最大的动作均分1的整体概率.
         '''
-        for s in range(self.num_states):
+        for s in range(self.num_obs):
             # 每次都要重新计算所有状态的动作价值函数.
             qsa_list = []
             for a in range(4):
