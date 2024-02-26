@@ -8,9 +8,12 @@ class PolicyIteration:
     """ 策略迭代算法 """
     def __init__(self, env, theta, gamma):
         self.env = env
-        if hasattr(self.env, 'ncol') and hasattr(self.env, 'nrow'): # self-defined cliff walking env
+        if hasattr(self.env, 'ncol') and hasattr(self.env, 'nrow'): 
             self.num_obs = self.env.ncol * self.env.nrow  # 状态数
-            self.num_actions = len(self.env.action_space)
+            if isinstance(self.env.action_space, list): # self-defined cliff walking env
+                self.num_actions = len(self.env.action_space)
+            else: # frozen lake env
+                self.num_actions = self.env.action_space.n
         else: # openai gym env
             self.num_obs = self.env.observation_space.n  # 状态数
             self.num_actions = self.env.action_space.n
