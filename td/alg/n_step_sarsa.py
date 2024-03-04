@@ -3,7 +3,13 @@ import numpy as np
 class NStepSarsa:
     def __init__(self, env, epsilon, alpha, gamma, n):
         self.env = env
-        self.num_obs = self.env.observation_space.n
+        try:
+            self.num_obs = self.env.observation_space.n
+        except: # for blackjack env
+            obs_space = self.env.observation_space 
+            self.num_obs = 1
+            for obs in obs_space:
+                self.num_obs *= obs.n
         self.num_actions = self.env.action_space.n
         self.q_table = np.zeros((self.num_obs, self.num_actions))
         self.epsilon = epsilon

@@ -3,7 +3,13 @@ import numpy as np
 class QLearning:
     def __init__(self, env, epsilon=0.1, alpha=0.1, gamma=0.9):
         self.env = env
-        self.num_obs = self.env.observation_space.n
+        try:
+            self.num_obs = self.env.observation_space.n
+        except: # for blackjack env
+            obs_space = self.env.observation_space 
+            self.num_obs = 1
+            for obs in obs_space:
+                self.num_obs *= obs.n
         self.num_action = self.env.action_space.n
         self.Q_table = np.zeros([self.num_obs, self.num_action]) # init Q(s,a) table
         self.epsilon = epsilon # epsilon in epsilon-greedy policy

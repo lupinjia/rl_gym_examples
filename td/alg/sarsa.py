@@ -4,7 +4,14 @@ class SARSA:
 
     def __init__(self, env, epsilon, alpha, gamma):
         self.env = env
-        self.num_obs = self.env.observation_space.n
+        # gym only defines observation space but not num_obs
+        try:
+            self.num_obs = self.env.observation_space.n
+        except: # for blackjack env
+            obs_space = self.env.observation_space 
+            self.num_obs = 1
+            for obs in obs_space:
+                self.num_obs *= obs.n
         self.num_action = self.env.action_space.n
         self.Q_table = np.zeros([self.num_obs, self.num_action]) # init Q(s,a) table
         self.epsilon = epsilon # epsilon in epsilon-greedy policy

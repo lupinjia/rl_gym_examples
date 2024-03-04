@@ -10,7 +10,13 @@ class DynaQ:
                  gamma,
                  n_planning):
         self.env = env
-        self.num_obs = self.env.observation_space.n  # 观测空间的维度
+        try:
+            self.num_obs = self.env.observation_space.n
+        except: # for blackjack env
+            obs_space = self.env.observation_space 
+            self.num_obs = 1
+            for obs in obs_space:
+                self.num_obs *= obs.n
         self.num_action = self.env.action_space.n  # 动作空间的维度
         self.q_table = np.zeros([self.num_obs, self.num_action])  # 初始化Q(s,a)表格
         self.alpha = alpha  # 学习率

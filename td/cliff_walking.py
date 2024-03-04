@@ -35,6 +35,7 @@ def main(argv):
         agent = SARSA(env, epsilon, alpha, gamma)
 
     return_list = []
+    # run the agent for num_episodes episodes
     for i in range(num_pbar):
         with tqdm(total=int(num_episodes/num_pbar), desc='Iteration %d'%i) as pbar:
             for i_episode in range(int(num_episodes/num_pbar)): # each pbar has (num_episodes/num_pbar) episodes
@@ -51,6 +52,8 @@ def main(argv):
                     episode_return += reward # do not consider gamma
                     if is_n_step: # n-step sarsa needs done flag
                         agent.update(obs, action, reward, next_obs, next_action, terminated or truncated)
+                    elif is_dyna_q or is_q_learning:
+                        agent.update(obs, action, reward, next_obs)
                     else:
                         agent.update(obs, action, reward, next_obs, next_action)
                     obs = next_obs

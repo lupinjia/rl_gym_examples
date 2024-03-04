@@ -69,6 +69,7 @@ def main(argv):
                 # update progress bar
                 pbar.update(1)
     # demonstrate the learned policy
+    # if specify render_mode='human', the agent will render the environment each step
     env = gym.make('Taxi-v3', render_mode='human')
     obs, _ = env.reset()
     terminated = False
