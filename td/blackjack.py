@@ -14,7 +14,7 @@ from utils.arg import parse_args
 # some hyperparameters
 epsilon = 0.1 # epsilon越大, 算法越倾向于随机选择动作, 越有可能探索更多的状态空间
 alpha = 0.1 # learning rate alpha. 加大更新力度，让下一个状态的Q值对当前状态Q值的影响更大一些
-gamma = 1.0
+gamma = 0.9
 num_episodes = 1500 # number of episodes to run. 500个episode时可能学不出来太好的效果，加大episode数可以在一定范围内提升学习效果
 num_pbar = 10 # number of progress bar
 n_steps = 5 # n-steps SARSA
@@ -69,24 +69,8 @@ def main(argv):
                     }) 
                 # update progress bar
                 pbar.update(1)
-    # demonstrate the learned policy
-    env = gym.make('Blackjack-v1', render_mode='human')
-    obs, _ = env.reset()
-    obs = transform_blackjack_obs(obs)
-    terminated = False
-    truncated = False
-    while not terminated and not truncated:
-        action = agent.take_action(obs)
-        obs, rew, terminated, truncated, _ = env.step(action)
-        obs = transform_blackjack_obs(obs)
-        if terminated or truncated:
-            print('reward: ', rew)
-        # print('Truncated: ', truncated, 'Terminated: ', terminated)
-        env.render()
-    env.close()
-
-    # print Q table
-    # print("Q table: \n", agent.Q_table)
+    # evaluate the learned policy
+    eval_blackjack_policy(env, agent)
     
     # plot the return curve
     episodes_list = list(range(len(return_list)))
@@ -99,6 +83,29 @@ def main(argv):
 def transform_blackjack_obs(obs):
     # transform blackjack observation(3 elements tuple) to a scalar
     return ((obs[0]*11 + obs[1]) * 2) + obs[2]
+
+def eval_blackjack_policy(env, agent, eval_time=10000):
+    # evaluate the learned policy for eval_time episodes
+    win, lose, draw = 0, 0, 0
+    for i in range(eval_time):
+        obs, _ = env.reset()
+        obs = transform_blackjack_obs(obs)
+        terminated = False
+        truncated = False
+        while not terminated and not truncated:
+            action = agent.take_action(obs)
+            obs, rew, terminated, truncated, _ = env.step(action)
+            obs = transform_blackjack_obs(obs)
+            if terminated or truncated:
+                if rew == 1:
+                    win += 1
+                elif rew == -1:
+                    lose += 1
+                else:
+                    draw += 1
+    print("Evaluation Result")
+    print("Win: %d, Lose: %d, Draw: %d"%(win, lose, draw))
+    print("Win Rate: %.3f, Lose Rate: %.3f, Draw Rate: %.3f"%(win/eval_time, lose/eval_time, draw/eval_time))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
