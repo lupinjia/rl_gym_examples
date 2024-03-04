@@ -11,18 +11,18 @@ class SARSA:
         self.alpha = alpha # learning rate
         self.gamma = gamma # discount factor
     
-    def take_action(self, state):  # 选取下一步的操作,具体实现为epsilon-贪婪
+    def take_action(self, obs):  # 选取下一步的操作,具体实现为epsilon-贪婪
         if np.random.random() < self.epsilon:
             action = np.random.randint(self.num_action) # encourage exploration
         else:
-            action = np.argmax(self.Q_table[state])
+            action = np.argmax(self.Q_table[obs])
         return action
     
-    def best_action(self, state):  # 用于打印策略
-        Q_max = np.max(self.Q_table[state])
+    def best_action(self, obs):  # 用于打印策略
+        Q_max = np.max(self.Q_table[obs])
         a = [0 for _ in range(self.num_action)]
         for i in range(self.num_action):  # 若两个动作的价值一样,都会记录下来
-            if self.Q_table[state, i] == Q_max:
+            if self.Q_table[obs, i] == Q_max:
                 a[i] = 1
         return a
     

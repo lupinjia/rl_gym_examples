@@ -10,20 +10,20 @@ from alg.n_step_sarsa import NStepSarsa
 from alg.dyna_q import DynaQ
 from utils.arg import parse_args
 
-np.random.seed(10)
+# np.random.seed(0)
 # some hyperparameters
 epsilon = 0.1 # epsilon越大, 算法越倾向于随机选择动作, 越有可能探索更多的状态空间
-alpha = 0.1 # learning rate alpha
+alpha = 0.1 # learning rate alpha. 加大更新力度，让下一个状态的Q值对当前状态Q值的影响更大一些
 gamma = 0.9
-num_episodes = 500 # number of episodes to run
+num_episodes = 1500 # number of episodes to run. 500个episode时可能学不出来太好的效果，加大episode数可以在一定范围内提升学习效果
 num_pbar = 10 # number of progress bar
-n_steps = 5 # 5-steps SARSA
+n_steps = 5 # n-steps SARSA
 n_planning = 2 # number of planning steps for Dyna-Q
 
 
 def main(argv):
-    # cliff walking env: https://gymnasium.farama.org/environments/toy_text/cliff_walking/
-    env = gym.make('CliffWalking-v0')
+    # taxi env: https://gymnasium.farama.org/environments/toy_text/taxi/
+    env = gym.make('Taxi-v3')
     is_q_learning, is_n_step, is_dyna_q = parse_args(argv)
     if is_q_learning: # if use Q-Learning
         agent = QLearning(env, epsilon, alpha, gamma)
@@ -51,6 +51,8 @@ def main(argv):
                     episode_return += reward # do not consider gamma
                     if is_n_step: # n-step sarsa needs done flag
                         agent.update(obs, action, reward, next_obs, next_action, terminated or truncated)
+                    elif is_dyna_q or is_q_learning:
+                        agent.update(obs, action, reward, next_obs)
                     else:
                         agent.update(obs, action, reward, next_obs, next_action)
                     obs = next_obs
@@ -67,15 +69,16 @@ def main(argv):
                 # update progress bar
                 pbar.update(1)
     # demonstrate the learned policy
-    env = gym.make('CliffWalking-v0', render_mode='human')
+    env = gym.make('Taxi-v3', render_mode='human')
     obs, _ = env.reset()
     terminated = False
     truncated = False
     while not terminated and not truncated:
         action = agent.take_action(obs)
         obs, rew, terminated, truncated, _ = env.step(action)
-        # print('Truncated: ', truncated, 'Terminated: ', terminated)
         env.render()
+        if terminated or truncated:
+            print('Truncated: ', truncated, 'Terminated: ', terminated)
     env.close()
 
     # print Q table
