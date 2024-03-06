@@ -11,9 +11,9 @@ Mention that this is not a framework or library, but rather a collection of exam
 
 ## File Structure
 
-- 'dp': Dynamic Programming examples
-- 'td': Temporal Difference (TD) learning examples
-
+- 'dp':  Dynamic Programming examples
+- 'td':  Temporal Difference (TD) learning examples
+- 'dqn': Deep Q-Network (DQN) examples
 ## TODO
 
 To implement examples of different simulation or RL platforms. 
