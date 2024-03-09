@@ -35,7 +35,7 @@ class Qnet(torch.nn.Module):
 class DQN:
     ''' DQN算法 '''
     def __init__(self, state_dim, hidden_dim, action_dim, learning_rate, gamma,
-                 epsilon, target_update, device):
+                 epsilon, target_update, device, dqn_type='VanillaDQN'):
         self.action_dim = action_dim
         self.q_net = Qnet(state_dim, hidden_dim,
                           self.action_dim).to(device)  # Q网络
@@ -50,6 +50,7 @@ class DQN:
         self.target_update = target_update  # 目标网络更新频率
         self.count = 0  # 计数器,记录更新次数
         self.device = device
+        self.dqn_type = dqn_type
 
     def take_action(self, state):  # epsilon-贪婪策略采取动作
         if np.random.random() < self.epsilon:
@@ -58,6 +59,11 @@ class DQN:
             state = torch.tensor(state, dtype=torch.float).to(self.device)
             action = self.q_net(state).argmax().item() # 选择Q值最大的动作
         return action
+    
+    def max_q_value(self, state):
+        # 输入的state为单个样本的数据
+        state = torch.tensor(state, dtype=torch.float, device=self.device)
+        return self.q_net(state).max().item() # 直接max()就可以得到标量
 
     def update(self, transition_dict):
         # 一个batch的经验数据
@@ -72,12 +78,19 @@ class DQN:
         dones = torch.tensor(transition_dict['dones'],
                              dtype=torch.float).view(-1, 1).to(self.device)
 
-        q_values = self.q_net(states).gather(1, actions)  # Q值
+        q_values = self.q_net(states).gather(1, actions) # 遵从gather()的规则取值
+                                                         # q_values会变成与actions一样的形状:(batch_size, 1)
+                                                         # 相当于取出actions对应的Q值.
         # 下个状态的最大Q值
-        max_next_q_values = self.target_q_net(next_states).max(1)[0].view(
-            -1, 1) # 在dim=1(action维度)上求最大值.
-                   # 调用max(1)后返回的是torch.return_types.max(values, indices)类型, 下标0提取values, 即最大值.提取出来是一维tensor.
-                   # 再用view()将一维tensor转换为二维tensor, 维度为(batch_size, 1).
+        if self.dqn_type == 'DoubleDQN':
+            max_action = self.q_net(next_states).max(1)[1].view(-1, 1) # max(1)[1]表示在dim=1上取最大值后得到其索引.
+            max_next_q_values = self.target_q_net(next_states).gather(1, max_action) # 选择max_action对应的Q值.
+        else:
+            max_next_q_values = self.target_q_net(next_states).max(1)[0].view(
+                -1, 1) # 在dim=1(action维度)上求最大值.
+                       # 调用max(1)后返回的是torch.return_types.max(values, indices)类型, 下标0提取values, 即最大值.提取出来是一维tensor.
+                       # 再用view()将一维tensor转换为二维tensor, 维度为(batch_size, 1).
+        
         # 如果下一个状态为终止状态(terminated), 则不需要考虑下一个状态的Q值.
         # 但truncated需要考虑
         q_targets = rewards + self.gamma * max_next_q_values * (1 - dones
