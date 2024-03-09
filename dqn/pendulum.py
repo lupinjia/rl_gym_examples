@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from alg.dqn import DQN, ReplayBuffer
+from alg.dueling_dqn import DQN, ReplayBuffer
 
 # agent parameters
 lr = 1e-2 # alpha in q-learning is replaced by lr in DQN
@@ -16,7 +16,7 @@ gamma = 0.98  # discount factor
 epsilon = 0.01  # exploration rate
 target_update = 50  # number of steps between target network updates
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")  # use GPU if available
-dqn_type = 'DoubleDQN' # DQN type, 'VanillaDQN' or 'DoubleDQN'
+dqn_type = 'DuelingDQN' # DQN type, 'VanillaDQN' or 'DoubleDQN' or 'DuelingDQN'
 # replay buffer parameters
 buffer_size = 5000  # size of replay buffer
 minimal_size = 1000  # minimum number of experience to start updating agent
