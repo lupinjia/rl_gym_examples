@@ -57,8 +57,8 @@ class ActorCritic: # 策略网络和值函数网络的结合
         log_probs = torch.log(self.actor(states).gather(1, actions))
         actor_loss = torch.mean(-log_probs * td_error.detach()) # detach()防止梯度传递, 共享数据内存, 值相同
         # 值函数网络的损失函数, 均方误差
-        # ?mean需要吗
-        critic_loss = torch.mean(F.mse_loss(self.critic(states), td_target.detach()))
+        # mse_loss已经计算了平均, 不需要mean
+        critic_loss = F.mse_loss(self.critic(states), td_target.detach())
         # prepare to update
         self.actor_optimizer.zero_grad()
         self.critic_optimizer.zero_grad()

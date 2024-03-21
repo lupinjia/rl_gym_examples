@@ -15,7 +15,7 @@ gamma = 0.98
 num_episodes = 1000
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # environment hyperparameters
-env_name = "CartPole-v0"
+env_name = "CartPole-v1"
 
 def train_on_policy_agent(env, agent, num_episodes):
     # to record episode returns
