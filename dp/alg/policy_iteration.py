@@ -1,4 +1,4 @@
-# Based on the code of Hands-on-RL(https://github.com/boyu-ai/Hands-on-RL/blob/main/%E7%AC%AC4%E7%AB%A0-%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E7%AE%97%E6%B3%95.ipynb)
+# Based on the code of Hands-on-RL(https://github.com/boyu-ai/Hands-on-RL/blob/main/)
 
 import copy
 import random
