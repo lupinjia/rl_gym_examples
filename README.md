@@ -14,6 +14,8 @@ I'll try to give as much algorithm implmentations as possible, all in gymnasium 
 - 'dp':  Dynamic Programming examples
 - 'td':  Temporal Difference (TD) learning examples
 - 'dqn': Deep Q Network (DQN) examples
+- 'reinforce': REINFORCE algorithm examples
+- 'actor_critic': Actor-Critic algorithm examples
 
 ## References
 
