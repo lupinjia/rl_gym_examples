@@ -1,8 +1,8 @@
 # rl_examples
 
-This repository contains examples of Reinforcement Learning algorithms implemented in Python.
+This repository contains examples of Reinforcement Learning algorithms in openai gymnasium environment, using Python.
 
-Mention that this is not a framework or library, but rather a collection of examples. I'll provide codes showing how to invoke APIs of different RL platforms and incorporate them with RL algorithms.
+I'll try to give as much algorithm implmentations as possible, all in gymnasium environment.
 
 ## Dependencies
 
@@ -14,15 +14,6 @@ Mention that this is not a framework or library, but rather a collection of exam
 - 'dp':  Dynamic Programming examples
 - 'td':  Temporal Difference (TD) learning examples
 - 'dqn': Deep Q Network (DQN) examples
-## TODO
-
-To implement examples of different simulation or RL platforms. 
-Platforms that can be considered include:
-
-- [ ] OpenAI Gym(ongoing)
-- [ ] PyBullet
-- [ ] MuJoCo
-- [ ] Isaac Sim
 
 ## References
 

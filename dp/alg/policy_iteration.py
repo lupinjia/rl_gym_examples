@@ -5,37 +5,36 @@ import random
 from itertools import accumulate
 
 class PolicyIteration:
-    """ 策略迭代算法 """
+    """ Policy Iteration """
     def __init__(self, env, theta, gamma):
         self.env = env
         if hasattr(self.env, 'ncol') and hasattr(self.env, 'nrow'): 
-            self.num_obs = self.env.ncol * self.env.nrow  # 状态数
+            self.num_obs = self.env.ncol * self.env.nrow  # number of states
             if isinstance(self.env.action_space, list): # self-defined cliff walking env
                 self.num_actions = len(self.env.action_space)
             else: # frozen lake env
                 self.num_actions = self.env.action_space.n
         else: # openai gym env
-            self.num_obs = self.env.observation_space.n  # 状态数
+            self.num_obs = self.env.observation_space.n  # number of states
             self.num_actions = self.env.action_space.n
-        self.v = [0] * self.num_obs  # 价值函数初始化为0
+        self.v = [0] * self.num_obs  # value function init to 0
         self.pi = [[1 / self.num_actions] * self.num_actions
-                       for i in range(self.num_obs)]  # 初始化为均匀随机策略
-        self.theta = theta  # 策略评估收敛阈值
-        self.gamma = gamma  # 折扣因子
+                       for i in range(self.num_obs)]  # init as a uniform stochastic policy
+        self.theta = theta  # Policy Iteration convergence threshold
+        self.gamma = gamma  # discount factor
 
     def policy_evaluation(self):
         """
         Policy Evaluation 
-        策略评估 
         
         作用: 通过若干轮更新, 得到当前策略下, 真实价值函数的估计值.
         
         估计真实价值函数使用的是贝尔曼期望方程
         """
-        cnt = 1  # 计数器
+        cnt = 1  # counter
         while 1:
             max_diff = 0
-            new_v = [0] * self.num_obs  # 新价值函数
+            new_v = [0] * self.num_obs  # new value function
             for s in range(self.num_obs):
                 qsa_list = []  # 开始计算状态s下的所有Q(s,a)价值
                 for a in range(4):
