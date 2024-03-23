@@ -17,6 +17,7 @@ class PolicyNet(nn.Module):
     
     def forward(self, x):
         x = F.relu(self.fc1(x))
+        # output value, not probability distribution, deterministic policy
         return torch.tanh(self.fc2(x)) * self.action_bound  # tanh activation(output range [-1, 1]) 
                                                             # and scale action to [-action_bound, action_bound]
 
@@ -55,7 +56,7 @@ class DDPG:
     
     def take_action(self, state):
         state = torch.FloatTensor([state]).to(self.device)
-        action = self.actor(state).item() #?
+        action = self.actor(state).item()
         # add exploration noise(gaussian)
         action += self.sigma * np.random.randn(self.action_dim)
         return action
