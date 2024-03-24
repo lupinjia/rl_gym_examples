@@ -4,6 +4,11 @@
 
 这个仓库记录了我在学习RL算法过程中实现的代码，我希望它能帮助其他人更好地学习和理解RL算法。
 
+## TODO
+
+- [ ] 给每个文件夹添加readme文件，解释算法
+- [ ] 完善每个算法的注释
+
 ## 特色
 
 - 每个算法配有文档：每个文件夹都有一个README.md文件来解释算法
@@ -45,3 +50,9 @@
 - 'ppo': 近端策略优化（PPO）算法
 - 'ddpg': 深度确定性策略梯度（DDPG）算法
 - 'sac': 软演员-评论家（SAC）算法
+
+## 参考文献
+
+- [Hands-on-RL](https://github.com/boyu-ai/Hands-on-RL)
+- [Gymnasium](https://gymnasium.farama.org/)
+- [EasyRL](https://datawhalechina.github.io/easy-rl/#/)
