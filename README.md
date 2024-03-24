@@ -21,7 +21,7 @@ This repo records my implementation of RL algorithms while learning, and I hope 
 
 ## Supported Algorithms
 
-![RL Algorithm Development Path](https://imgur.com/a/gGGGRWP)
+![RL Algorithm Development Path](https://i.imgur.com/Szbxpri.png)
 
 | Algorithm | Observation Space | Action Space | Model-based or Model-free | On-policy or Off-policy |
 | --- | --- | --- | --- | --- |
