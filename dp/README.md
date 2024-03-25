@@ -15,3 +15,9 @@ Dynamic Programming (DP) is a model-based method to solve Markov Decision Proces
 You can find more information about DP in the following resources:
 
 - [Hands on RL](https://hrl.boyuai.com/chapter/1/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E7%AE%97%E6%B3%95)
+
+
+# Additional Notes
+
+- The provided examples are designed for educational purposes, illustrating the core concepts of TD learning.
+- Users are encouraged to modify and extend these examples to explore different aspects of TD learning and its applications.
