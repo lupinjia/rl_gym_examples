@@ -1,4 +1,4 @@
-# rl_examples
+# rl_gym_examples
 
 This repository contains examples of common Reinforcement Learning algorithms in openai gymnasium environment, using Python.
 
@@ -6,8 +6,8 @@ This repo records my implementation of RL algorithms while learning, and I hope 
 
 ## Features
 
-- Document for each algorithm: Every folder has a README.md file to explain the algorithm
-- Examples in openai gymnasium environment
+- Document for each algorithm: Every folder has a README.md file to introduce the algorithm
+- Examples in OpenAI Gymnasium environments
 - Detailed comments
 
 ## Dependencies

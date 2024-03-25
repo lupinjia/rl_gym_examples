@@ -1,4 +1,4 @@
-# rl_examples
+# rl_gym_examples
 
 这个仓库包含了在OpenAI Gymnasium环境使用Python实现的常见强化学习算法示例。
 
@@ -11,8 +11,8 @@
 
 ## 特色
 
-- 每个算法配有文档：每个文件夹都有一个README.md文件来解释算法
-- 在OpenAI Gym环境中的示例
+- 每个算法配有文档：每个文件夹都有一个README.md文件来介绍算法
+- 在OpenAI Gymnasium环境中的示例
 - 详细的注释
 
 ## 依赖
