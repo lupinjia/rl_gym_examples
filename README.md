@@ -13,26 +13,26 @@ This repo records my implementation of RL algorithms while learning, and I hope 
 
 ## :rocket:Getting Started
 
-First, install the dependencies:
-- conda(recommended)
+1. First, install the dependencies:
+    - conda (recommended)
 
-Create a new conda environment using the yml file:
-```Bash
-conda create -f rl_gym_examples.yml
-```
-- pip
+    Create a new conda environment using the yml file:
+    ```Bash
+    conda create -f rl_gym_examples.yml
+    ```
+    - pip
 
-You can also install the dependencies using pip(though it is not recommended):
-```Bash
-pip install -r requirements.txt
-```
-The Python version is 3.8.
+    You can also install the dependencies using pip(though it is not recommended):
+    ```Bash
+    pip install -r requirements.txt
+    ```
+    The Python version is 3.8.
 
-Then, you can run the examples in the corresponding folders, for example:
-```Bash
-cd dp
-python gym_cliff_walking.py
-```
+2. Then, you can run the examples in the corresponding folders, for example:
+    ```Bash
+    cd dp
+    python gym_cliff_walking.py
+    ```
 
 ### :bulb:Tips
 

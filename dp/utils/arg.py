@@ -2,6 +2,7 @@ import sys
 import getopt
 
 def parse_args(argv):
+    '''parse arguments to determine whether to use policy iteration or value iteration'''
     is_policy_iteration = False
     
     try:

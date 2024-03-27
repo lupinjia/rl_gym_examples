@@ -4,47 +4,47 @@ import random
 from itertools import accumulate
 
 class ValueIteration:
-    """ 价值迭代算法 """
+    """ Value Iteration """
     def __init__(self, env, theta, gamma):
         self.env = env
         if hasattr(self.env, 'ncol') and hasattr(self.env, 'nrow'): 
-            self.num_obs = self.env.ncol * self.env.nrow  # 状态数
-            if isinstance(self.env.action_space, list): # self-defined cliff walking env
+            self.num_obs = self.env.ncol * self.env.nrow
+            if isinstance(self.env.action_space, list): # for self-defined cliff walking env
                 self.num_actions = len(self.env.action_space)
             else: # frozen lake env
                 self.num_actions = self.env.action_space.n
         else: # openai gym env
-            self.num_obs = self.env.observation_space.n  # 状态数
+            self.num_obs = self.env.observation_space.n
             self.num_actions = self.env.action_space.n
-        self.v = [0] * self.num_obs  # 初始化价值为0
-        self.theta = theta  # 价值收敛阈值
+        self.v = [0] * self.num_obs  # init state value
+        self.theta = theta  # convergence threshold for state value
         self.gamma = gamma
-        # 价值迭代结束后得到的策略
+        # policy
         self.pi = [None for i in range(self.num_obs)]
 
     def value_iteration(self):
-        cnt = 1  # 记录迭代次数
+        cnt = 1  # iteration count
         while 1:
             max_diff = 0
             new_v = [0] * self.num_obs
             for s in range(self.num_obs):
-                qsa_list = []  # 开始计算状态s下的所有Q(s,a)价值
+                qsa_list = []  # calculate all Q(s,a) values for state s
                 for a in range(4):
                     qsa = 0
                     for res in self.env.P[s][a]:
                         p, next_state, r, done = res
                         qsa += p * (r + self.gamma * self.v[next_state] *
                                     (1 - done))
-                    qsa_list.append(qsa)  # 这一行和下一行代码是价值迭代和策略迭代的主要区别
-                new_v[s] = max(qsa_list)
+                    qsa_list.append(qsa)  # This line and next line are the main difference between value iteration and policy iteration.
+                new_v[s] = max(qsa_list)  # value iteration uses bellman optimality equation
                 max_diff = max(max_diff, abs(new_v[s] - self.v[s]))
             self.v = new_v
-            if max_diff < self.theta: break  # 满足收敛条件,退出评估迭代
+            if max_diff < self.theta: break  # fulfill convergence condition, break out of loop
             cnt += 1
         print("Value iteration converged in %d iterations." % cnt)
         self.get_policy()
 
-    def get_policy(self):  # 根据价值函数导出一个贪婪策略
+    def get_policy(self):  # get a greedy policy based on the current value function
         for s in range(self.num_obs):
             qsa_list = []
             for a in range(4):
@@ -54,8 +54,8 @@ class ValueIteration:
                     qsa += p * (r + self.gamma * self.v[next_state] * (1 - done))
                 qsa_list.append(qsa)
             maxq = max(qsa_list)
-            cntq = qsa_list.count(maxq)  # 计算有几个动作得到了最大的Q值
-            # 让这些动作均分概率
+            cntq = qsa_list.count(maxq)  # quantity of actions with maximum Q-value
+            # assign the probability sum of 1 to actions with max Q, equally
             self.pi[s] = [1 / cntq if q == maxq else 0 for q in qsa_list]
     
     def act(self, state):

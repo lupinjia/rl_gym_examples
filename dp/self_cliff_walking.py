@@ -9,7 +9,7 @@ def print_agent(agent, action_meaning, disaster=[], end=[]):
     print("State Value: ")
     for i in range(agent.env.nrow):
         for j in range(agent.env.ncol):
-            # 为了输出美观,保持输出6个字符
+            # Keep the output in 6 characters to make it easier to read.
             print('%6.6s' % ('%.3f' % agent.v[i * agent.env.ncol + j]),
                   end=' ')
         print()
@@ -17,10 +17,10 @@ def print_agent(agent, action_meaning, disaster=[], end=[]):
     print("Policy: ")
     for i in range(agent.env.nrow):
         for j in range(agent.env.ncol):
-            # 一些特殊的状态,例如悬崖漫步中的悬崖
+            # Some special states, like the cliff in Cliff-Walking
             if (i * agent.env.ncol + j) in disaster:
                 print('****', end=' ')
-            elif (i * agent.env.ncol + j) in end:  # 目标状态
+            elif (i * agent.env.ncol + j) in end:  # goal state
                 print('EEEE', end=' ')
             else:
                 a = agent.pi[i * agent.env.ncol + j]
