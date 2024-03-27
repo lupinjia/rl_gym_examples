@@ -13,7 +13,7 @@ This repo records my implementation of RL algorithms while learning, and I hope 
 
 ## :rocket:Getting Started
 
-1. First, install the dependencies:
+1. First, install the dependencies, you can install dependencies using conda or pip:
     - conda (recommended)
 
     Create a new conda environment using the yml file:

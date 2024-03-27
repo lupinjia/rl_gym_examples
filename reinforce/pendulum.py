@@ -7,7 +7,7 @@ import torch
 from alg.reinforce import REINFORCE
 
 # agent params
-learning_rate = 1e-3
+learning_rate = 1e-5
 gamma = 0.98
 hidden_dim = 128
 # training params
@@ -15,8 +15,8 @@ num_pbar = 10
 num_episodes = 500
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # environment params
-env_name = "CartPole-v1"
-action_type = "discrete"
+env_name = "Pendulum-v1"
+action_type = "continuous"
 
 def set_seed(seed):
     torch.manual_seed(seed)
@@ -28,7 +28,7 @@ def main():
     set_seed(0)
     # create agent
     state_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.n
+    action_dim = env.action_space.shape[0]
     agent = REINFORCE(state_dim, hidden_dim, action_dim, learning_rate, gamma, device, action_type)
     # record episode return, for plotting
     return_list = []
