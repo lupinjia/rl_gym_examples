@@ -5,13 +5,13 @@ This repository contains examples of common Reinforcement Learning algorithms in
 This repo records my implementation of RL algorithms while learning, and I hope it can help others learn and understand RL algorithms better.
 
 
-## :star: Features
+## :sparkles:Features
 
 - Document for each algorithm: Every folder has a README.md file to introduce the algorithm
 - Examples in OpenAI Gymnasium environments
 - Detailed comments
 
-## Getting Started
+## :rocket:Getting Started
 
 First, install the dependencies:
 - conda(recommended)
@@ -34,11 +34,11 @@ cd dp
 python gym_cliff_walking.py
 ```
 
-### Tips
+### :bulb:Tips
 
 The pytorch in the dependencies is cpu version, you can install the gpu version by following the instructions in the [pytorch website](https://pytorch.org/get-started/locally/).
 
-## Supported Algorithms
+## :books:Supported Algorithms
 
 ![RL Algorithm Development Path](https://i.imgur.com/Szbxpri.png)
 
@@ -54,7 +54,7 @@ The pytorch in the dependencies is cpu version, you can install the gpu version 
 | DDPG | Continuous | Continuous | Model-free | off-policy |
 | SAC | Continuous | Continuous | Model-free | off-policy |
 
-## File Structure
+## :file_folder:File Structure
 
 - 'dp':  Dynamic Programming
 - 'td':  Temporal Difference (TD) learning
@@ -65,7 +65,7 @@ The pytorch in the dependencies is cpu version, you can install the gpu version 
 - 'ddpg': Deep Deterministic Policy Gradient (DDPG) algorithm
 - 'sac': Soft Actor-Critic (SAC) algorithm
 
-## References
+## :memo:References
 
 - [Hands-on-RL](https://github.com/boyu-ai/Hands-on-RL)
 - [Gymnasium](https://gymnasium.farama.org/)
