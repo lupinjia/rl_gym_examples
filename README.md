@@ -5,7 +5,7 @@ This repository contains examples of common Reinforcement Learning algorithms in
 This repo records my implementation of RL algorithms while learning, and I hope it can help others learn and understand RL algorithms better.
 
 
-## Features
+## :star: Features
 
 - Document for each algorithm: Every folder has a README.md file to introduce the algorithm
 - Examples in OpenAI Gymnasium environments
