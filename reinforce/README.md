@@ -2,6 +2,8 @@
 
 - **alg**: Contains the implementation of REINFORCE algorithm, or the Vanilla Policy Gradient algorithm.
 - **cartpole.py**: REINFORCE training example on the CartPole environment of OpenAI Gymnasium.
+- **acrobot.py**: REINFORCE training example on the Acrobot environment of OpenAI Gymnasium.
+- Also have tried on envs with continuous action space such as Pendulum-v1 and MountainCarContinuous-v0. But the results are not good. May be because the vpg is not good enough.
 
 # Algorithm Introduction
 

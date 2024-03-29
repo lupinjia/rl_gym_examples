@@ -1,6 +1,6 @@
 import gymnasium as gym
 import sys
-from tqdm import tqdm  # tqdm是显示循环进度条的库
+from tqdm import tqdm  # tqdm is a progress bar library
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -13,6 +13,7 @@ from utils.arg import parse_args
 # np.random.seed(0)
 # some hyperparameters
 epsilon = 0.2 # epsilon越大, 算法越倾向于随机选择动作, 越有可能探索更多的状态空间
+# The bigger the epsilon, the more random the agent will be.
 alpha = 0.3 # learning rate alpha. 加大更新力度，让下一个状态的Q值对当前状态Q值的影响更大一些
 gamma = 1.0 # FrozenLake环境中，每走一步或者掉入冰洞都不会得到奖励，只有到终点才会有+1的奖励，
             # 而终点离开始比较远，这就要求agent考虑长远的奖励，gamma=1.0，不衰减可能能得到更好的效果

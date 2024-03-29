@@ -16,7 +16,7 @@ class QLearning:
         self.alpha = alpha # learning rate
         self.gamma = gamma # discount factor
     
-    def take_action(self, obs):  # 选取下一步的操作,具体实现为epsilon-贪婪
+    def take_action(self, obs):  # epsilon-greedy policy
         if np.random.random() < self.epsilon:
             action = np.random.randint(self.num_action) # encourage exploration
         else:

@@ -1,6 +1,6 @@
 import gymnasium as gym
 import sys
-from tqdm import tqdm  # tqdm是显示循环进度条的库
+from tqdm import tqdm  # tqdm is a progress bar library
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -13,6 +13,7 @@ from utils.arg import parse_args
 np.random.seed(10)
 # some hyperparameters
 epsilon = 0.1 # epsilon越大, 算法越倾向于随机选择动作, 越有可能探索更多的状态空间
+# The bigger the epsilon, the more random the agent will be.
 alpha = 0.1 # learning rate alpha
 gamma = 0.9
 num_episodes = 500 # number of episodes to run

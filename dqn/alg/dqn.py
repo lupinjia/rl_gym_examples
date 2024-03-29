@@ -8,29 +8,29 @@ from torch.nn import functional as F
 class ReplayBuffer:
     ''' 经验回放池 '''
     def __init__(self, capacity):
-        self.buffer = collections.deque(maxlen=capacity)  # 队列,先进先出
+        self.buffer = collections.deque(maxlen=capacity)  # double ended queue, FIFO
 
-    def add(self, state, action, reward, next_state, done):  # 将数据加入buffer
+    def add(self, state, action, reward, next_state, done):
         self.buffer.append((state, action, reward, next_state, done))
 
-    def sample(self, batch_size):  # 从buffer中采样数据,数量为batch_size
+    def sample(self, batch_size):  # sample data from buffer, with size of batch_size
         transitions = random.sample(self.buffer, batch_size) # 从buffer中随机采样batch_size个数据,返回一个元素为元组的列表.每个数据为一个元组.
         state, action, reward, next_state, done = zip(*transitions) # 将最外层的列表解包，用zip函数将每个元组相同位置的元素组合成一个新的元组.
         return np.array(state), action, reward, np.array(next_state), done
 
-    def size(self):  # 目前buffer中数据的数量
+    def size(self):
         return len(self.buffer)
 
 class Qnet(torch.nn.Module):
     ''' 只有一层隐藏层的Q网络 '''
     def __init__(self, state_dim, hidden_dim, action_dim):
         super(Qnet, self).__init__()
-        self.fc1 = torch.nn.Linear(state_dim, hidden_dim)  # 隐藏层1
-        self.fc2 = torch.nn.Linear(hidden_dim, action_dim) # 输出层
+        self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
+        self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))  # 隐藏层使用ReLU激活函数
-        return self.fc2(x) # 输出层不使用激活函数
+        x = F.relu(self.fc1(x))
+        return self.fc2(x)
 
 class DQN:
     ''' DQN算法 '''
@@ -38,30 +38,28 @@ class DQN:
                  epsilon, target_update, device, dqn_type='VanillaDQN'):
         self.action_dim = action_dim
         self.q_net = Qnet(state_dim, hidden_dim,
-                          self.action_dim).to(device)  # Q网络
-        # 目标网络
+                          self.action_dim).to(device)
         self.target_q_net = Qnet(state_dim, hidden_dim,
                                  self.action_dim).to(device)
-        # 使用Adam优化器
         self.optimizer = torch.optim.Adam(self.q_net.parameters(),
                                           lr=learning_rate)
-        self.gamma = gamma  # 折扣因子
-        self.epsilon = epsilon  # epsilon-贪婪策略
-        self.target_update = target_update  # 目标网络更新频率
-        self.count = 0  # 计数器,记录更新次数
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.target_update = target_update  # target net update frequency
+        self.count = 0                      # update count
         self.device = device
         self.dqn_type = dqn_type
 
-    def take_action(self, state):  # epsilon-贪婪策略采取动作
+    def take_action(self, state):  # epsilon-greedy策略
         if np.random.random() < self.epsilon:
             action = np.random.randint(self.action_dim)
         else:
             state = torch.tensor(state, dtype=torch.float).to(self.device)
-            action = self.q_net(state).argmax().item() # 选择Q值最大的动作
+            action = self.q_net(state).argmax().item()  # select action with max Q value
         return action
     
     def max_q_value(self, state):
-        # 输入的state为单个样本的数据
+        # state: 1 state
         state = torch.tensor(state, dtype=torch.float, device=self.device)
         return self.q_net(state).max().item() # 直接max()就可以得到标量
 

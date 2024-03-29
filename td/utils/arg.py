@@ -2,6 +2,12 @@ import sys
 import getopt
 
 def parse_args(argv):
+    '''To choose the algorithm to run:
+    -q: Q-learning
+    -n: N-step Q-learning
+    -d: Dyna-Q
+    default: SARSA
+    '''
     is_q_learning = False
     is_n_step = False
     is_dyna_q = False
