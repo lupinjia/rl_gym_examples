@@ -5,17 +5,17 @@ import torch.optim as optim
 
 class PolicyNetDiscrete(nn.Module):
     def __init__(self, state_dim, hidden_dim, action_dim):
-        super(PolicyNetDiscrete, self).__init__() # inherit from nn.Module
+        super(PolicyNetDiscrete, self).__init__()
         self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
         self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
-        return F.softmax(self.fc2(x), dim=1) # dim=1表示在action维度上求和计算softmax
+        return F.softmax(self.fc2(x), dim=1)
 
 class PolicyNetContinuous(nn.Module):
     def __init__(self, state_dim, hidden_dim, action_dim):
-        super(PolicyNetContinuous, self).__init__() # inherit from nn.Module
+        super(PolicyNetContinuous, self).__init__()
         self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
         self.fc_mu = torch.nn.Linear(hidden_dim, action_dim)   # mean value of gaussian distribution
         self.fc_std = torch.nn.Linear(hidden_dim, action_dim)  # standard deviation of gaussian distribution
@@ -35,11 +35,11 @@ class REINFORCE:
         elif action_type == 'continuous':
             self.policy_net = PolicyNetContinuous(state_dim, hidden_dim, action_dim).to(device)
         self.optimizer = torch.optim.Adam(self.policy_net.parameters(),
-                                          lr=learning_rate)  # 使用Adam优化器
-        self.gamma = gamma  # 折扣因子
+                                          lr=learning_rate)
+        self.gamma = gamma
         self.device = device
 
-    def take_action(self, state):  # 根据动作概率分布随机采样
+    def take_action(self, state):  # randomly sample an action according to the probability distribution
         state = torch.tensor(state.reshape(1, -1), dtype=torch.float).to(self.device) # 将state再包一层list后转为tensor
                                                                          # 这样就可以得到1*state_dim的tensor
                                                                          # 但这个方法会引起警告UserWarning: Creating a tensor from a list 
@@ -47,7 +47,7 @@ class REINFORCE:
                                                                          # list to a single numpy.ndarray with numpy.array() before converting to a tensor.
         if self.action_type == 'discrete':
             probs = self.policy_net(state)
-            action_dist = torch.distributions.Categorical(probs) # Categorical分布
+            action_dist = torch.distributions.Categorical(probs) # Categorical Distribution(https://en.wikipedia.org/wiki/Categorical_distribution)
                                                                 # Categorical是多项分布的特例, 相当于只进行1次试验的多项分布
             action = action_dist.sample() # Categorical采样时会根据概率分布在[0,n-1]之间采样一个动作
             return action.item()  # discrete action, return scalar
@@ -64,18 +64,18 @@ class REINFORCE:
 
         G = 0
         self.optimizer.zero_grad()
-        for i in reversed(range(len(reward_list))):  # 从最后一步算起
+        for i in reversed(range(len(reward_list))):  # Back to Front, calc G
             reward = reward_list[i]
             state = torch.tensor(state_list[i].reshape(1, -1),
                                  dtype=torch.float).to(self.device)
             action = torch.tensor(action_list[i]).view(-1, 1).to(self.device)
             if self.action_type == 'discrete':
-                log_prob = torch.log(self.policy_net(state).gather(1, action)) # 计算采取的动作的对数概率
+                log_prob = torch.log(self.policy_net(state).gather(1, action))  # calc log probability of action
             else:
                 mu, std = self.policy_net(state)
                 action_dist = torch.distributions.Normal(mu, std)
                 log_prob = action_dist.log_prob(action)
-            G = self.gamma * G + reward # 计算累积折扣奖励, 使用当前动作往后的奖励
-            loss = -log_prob * G  # 每一步的损失函数
-            loss.backward()  # 反向传播计算梯度
-        self.optimizer.step()  # 梯度下降
+            G = self.gamma * G + reward  # calculate return starting from this step
+            loss = -log_prob * G         # loss of each step
+            loss.backward()              # The gradient will be accumulated in each step
+        self.optimizer.step()

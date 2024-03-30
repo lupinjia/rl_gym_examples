@@ -6,50 +6,51 @@ import numpy as np
 
 class VAnet(torch.nn.Module):
     '''
-    只有一层隐藏层的A网络和V网络
+    VAnet, calc Q value using advantage value and state value function
     '''
     def __init__(self, state_dim, hidden_dim, action_dim):
         super(VAnet, self).__init__()
-        self.fc1 = torch.nn.Linear(state_dim, hidden_dim) # 共享网络部分
-        self.fc_A = torch.nn.Linear(hidden_dim, action_dim) # 输出优势值
-        self.fc_V = torch.nn.Linear(hidden_dim, 1) # 输出状态值函数
+        self.fc1 = torch.nn.Linear(state_dim, hidden_dim)   # shared part
+        self.fc_A = torch.nn.Linear(hidden_dim, action_dim) # output advantage
+        self.fc_V = torch.nn.Linear(hidden_dim, 1)          # ouput state value
     
     def forward(self, x):
         A = self.fc_A(F.relu(self.fc1(x)))
         V = self.fc_V(F.relu(self.fc1(x)))
-        Q = V + A - A.mean(1).view(-1, 1) # 状态值函数加上优势值减去平均优势值
+        Q = V + A - A.mean(1).view(-1, 1)   # 状态值函数加上优势值减去平均优势值
         return Q
 
 class Qnet(torch.nn.Module):
-    ''' 只有一层隐藏层的Q网络 '''
     def __init__(self, state_dim, hidden_dim, action_dim):
         super(Qnet, self).__init__()
-        self.fc1 = torch.nn.Linear(state_dim, hidden_dim)  # 隐藏层1
-        self.fc2 = torch.nn.Linear(hidden_dim, action_dim) # 输出层
+        self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
+        self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))  # 隐藏层使用ReLU激活函数
-        return self.fc2(x) # 输出层不使用激活函数
+        x = F.relu(self.fc1(x))
+        return self.fc2(x)
     
 class ReplayBuffer:
     ''' 经验回放池 '''
     def __init__(self, capacity):
-        self.buffer = collections.deque(maxlen=capacity)  # 队列,先进先出
+        self.buffer = collections.deque(maxlen=capacity)  # double end queue, FIFO
 
-    def add(self, state, action, reward, next_state, done):  # 将数据加入buffer
+    def add(self, state, action, reward, next_state, done):
         self.buffer.append((state, action, reward, next_state, done))
 
-    def sample(self, batch_size):  # 从buffer中采样数据,数量为batch_size
-        transitions = random.sample(self.buffer, batch_size) # 从buffer中随机采样batch_size个数据,返回一个元素为元组的列表.每个数据为一个元组.
-        state, action, reward, next_state, done = zip(*transitions) # 将最外层的列表解包，用zip函数将每个元组相同位置的元素组合成一个新的元组.
+    def sample(self, batch_size):  # sample data from buffer, with size of batch_size
+        transitions = random.sample(self.buffer, batch_size) # randomly sample batch_size transitions from buffer
+        # return a list of transitions, each transition is a tuple of (state, action, reward, next_state, done)
+        state, action, reward, next_state, done = zip(*transitions) # unpack the list, merge the elements in transitions with same index into a new tuple.
         return np.array(state), action, reward, np.array(next_state), done
 
-    def size(self):  # 目前buffer中数据的数量
+    def size(self):
         return len(self.buffer)
 
 class DQN:
     '''
-    DQN算法, 包括Double DQN and Dueling DQN
+    DQN Agent, 
+    including Double DQN and Dueling DQN
     '''
     def __init__(self,
                  state_dim,
@@ -78,21 +79,21 @@ class DQN:
         self.device = device
         self.dqn_type = dqn_type
     
-    def take_action(self, state):  # epsilon-贪婪策略采取动作
+    def take_action(self, state):  # epsilon-greedy policy
         if np.random.random() < self.epsilon:
             action = np.random.randint(self.action_dim)
         else:
             state = torch.tensor(state, dtype=torch.float).to(self.device)
-            action = self.q_net(state).argmax().item() # 选择Q值最大的动作
+            action = self.q_net(state).argmax().item()  # select action with highest Q-value
         return action
 
     def max_q_value(self, state):
-        # 输入的state为单个样本的数据
+        # state: 1 state
         state = torch.tensor(state, dtype=torch.float, device=self.device)
         return self.q_net(state).max().item() # 直接max()就可以得到标量
     
     def update(self, transition_dict):
-        # 一个batch的经验数据
+        # experience data of a batch
         states = torch.tensor(transition_dict['states'],
                               dtype=torch.float).to(self.device)
         actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(
@@ -106,7 +107,7 @@ class DQN:
         q_values = self.q_net(states).gather(1, actions) # 遵从gather()的规则取值
                                                          # q_values会变成与actions一样的形状:(batch_size, 1)
                                                          # 相当于取出actions对应的Q值.
-        # 下个状态的最大Q值
+        # max Q value of next state, for calcing td target
         if self.dqn_type == 'DoubleDQN':
             max_action = self.q_net(next_states).max(1)[1].view(-1, 1) # max(1)[1]表示在dim=1上取最大值后得到其索引.
             max_next_q_values = self.target_q_net(next_states).gather(1, max_action) # 选择max_action对应的Q值.
@@ -118,15 +119,14 @@ class DQN:
         
         # 如果下一个状态为终止状态(terminated), 则不需要考虑下一个状态的Q值.
         # 但truncated需要考虑
-        q_targets = rewards + self.gamma * max_next_q_values * (1 - dones
-                                                                )  # TD误差目标
-        dqn_loss = torch.mean(F.mse_loss(q_values, q_targets))  # 均方误差损失函数
-        self.optimizer.zero_grad()  # PyTorch中默认梯度会累积,这里需要显式将梯度置为0
-        dqn_loss.backward()  # 反向传播更新参数
+        q_targets = rewards + self.gamma * max_next_q_values * (1 - dones)  # TD误差目标
+        dqn_loss = F.mse_loss(q_values, q_targets)
+        self.optimizer.zero_grad()
+        dqn_loss.backward()
         self.optimizer.step()
 
-        # Q网络每个step都会更新. 目标网络每target_update个step更新一次.
+        # Q network updates every step, target network updates every target_update steps.
         if self.count % self.target_update == 0:
             self.target_q_net.load_state_dict(
-                self.q_net.state_dict())  # 更新目标网络, 将Q网络参数复制到目标网络中
+                self.q_net.state_dict())  # copy q_net weights to target_q_net
         self.count += 1
