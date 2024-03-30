@@ -120,6 +120,8 @@ class PPOContinuous:
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=critic_lr)
         # hyperparameters
+        self.state_dim = state_dim
+        self.action_dim = action_dim
         self.lmbda = lmbda
         self.epochs = epochs # Number of epochs trained using each trajectory
         self.eps = eps       # Epsilon, specify the clipping range in PPO-clip
@@ -127,26 +129,24 @@ class PPOContinuous:
         self.device = device
     
     def take_action(self, state):
-        state = torch.tensor([state], dtype=torch.float).to(self.device)
+        state = torch.tensor(state.reshape(1, -1), dtype=torch.float).to(self.device)
         mu, sigma = self.actor(state)
         action = torch.distributions.Normal(mu, sigma).sample()
-        return [action.item()]
+        return action.numpy().reshape(-1)
     
     def update(self, transition_dict):
         # The transition_dict contains a list of transitions for a single episode.
         # Convert transition_dict to tensors
-        states = torch.tensor(transition_dict['states'], 
+        states = torch.tensor(np.array(transition_dict['states']), 
                               dtype=torch.float).to(self.device) # shape: (episode_length, state_dim)
-        actions = torch.tensor(transition_dict['actions'], 
-                               dtype=torch.float).view(-1, 1).to(self.device) # shape: (episode_length, 1)
+        actions = torch.tensor(np.array(transition_dict['actions']), 
+                               dtype=torch.float).view(-1, self.action_dim).to(self.device) # shape: (episode_length, 1)
         rewards = torch.tensor(transition_dict['rewards'], 
                                dtype=torch.float).view(-1, 1).to(self.device) # shape: (episode_length, 1)
-        next_states = torch.tensor(transition_dict['next_states'], 
+        next_states = torch.tensor(np.array(transition_dict['next_states']), 
                                    dtype=torch.float).to(self.device) # shape: (episode_length, state_dim
         dones = torch.tensor(transition_dict['dones'], 
                              dtype=torch.float).view(-1, 1).to(self.device) # shape: (episode_length, 1)
-        rewards = (rewards + 8.0) / 8.0 # normalize rewards to [-1, 1].
-                                        # The Pendulum env has a reward range of [-16.2736044, 0]
         # compute td error
         td_targets = rewards + self.gamma * self.critic(next_states) * (1 - dones)
         td_delta = td_targets - self.critic(states) # Temporal Difference Error(can also be called advantage in actor-critic)
@@ -185,4 +185,9 @@ class PPOContinuous:
             advantage = delta + gamma * lmbda * advantage # Deltas that are more close to the epsode end will multiply more times gamma and lambda
             advantage_list.append(advantage)
         advantage_list.reverse() # reverse order back to original
-        return torch.tensor(advantage_list, dtype=torch.float)
+        return torch.tensor(np.array(advantage_list), dtype=torch.float)
+    
+    def eval(self):
+        '''Set the networks to evaluation mode'''
+        self.actor.eval()
+        self.critic.eval()
