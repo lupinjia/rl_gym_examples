@@ -6,10 +6,12 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
-from alg.reinforce import REINFORCE
+from alg.actor_critic import ActorCritic
 
 # agent hyperparameters
-lr = 1e-4
+actor_lr = 1e-3
+critic_lr = 1e-2
+action_dim = 6 # Discretization of action space. Divide action space(-2,2) into 11 bins.
 gamma = 0.99
 hidden_dim = 128
 # training hyperparameters
@@ -17,7 +19,16 @@ num_episodes = 1000
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # environment hyperparameters
 env_name = "Pendulum-v1"
-action_type = "continuous"
+action_type = "discrete"
+
+def dis_to_con(discrete_action, env, action_dim):
+    """
+    Convert discrete action to continuous action.
+    """
+    action_lowbound = env.action_space.low[0] # get the first element from the list
+    action_upbound = env.action_space.high[0]
+    action_con = action_lowbound + (action_upbound - action_lowbound) * discrete_action / (action_dim - 1)
+    return np.array([action_con])
 
 def train_on_policy_agent(env, agent, num_episodes):
     # to record episode returns
@@ -39,12 +50,13 @@ def train_on_policy_agent(env, agent, num_episodes):
                 terminated, truncated = False, False
                 while not terminated and not truncated: # interaction loop
                     # select action
-                    action = agent.take_action(state)
+                    action_discrete = agent.take_action(state)
+                    action = dis_to_con(action_discrete, env, action_dim)
                     # step the environment
                     next_state, reward, terminated, truncated, _ = env.step(action)
                     # store transition
                     transition_dict["states"].append(state)
-                    transition_dict["actions"].append(action)
+                    transition_dict["actions"].append(action_discrete)
                     transition_dict["next_states"].append(next_state)
                     transition_dict["rewards"].append(reward)
                     transition_dict["dones"].append(terminated)
@@ -75,7 +87,8 @@ def render_agent(env_name, agent):
     terminated, truncated = False, False
     while not terminated and not truncated: # interaction loop
         # select action
-        action = agent.take_action(state)
+        action_discrete = agent.take_action(state)
+        action = dis_to_con(action_discrete, env, action_dim)
         # step the environment
         next_state, reward, terminated, truncated, _ = env.step(action)
         # render environment
@@ -87,11 +100,10 @@ def main():
     # create environment
     env = gym.make(env_name)
     # set seeds
-    torch.manual_seed(0)
+    torch.manual_seed(1)
     # create agent
     state_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.shape[0]
-    agent = REINFORCE(state_dim, hidden_dim, action_dim, lr, gamma, device, action_type)
+    agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device, action_type)
     # train agent
     return_list = train_on_policy_agent(env, agent, num_episodes)
     # plot return curve
@@ -99,7 +111,7 @@ def main():
     plt.plot(episodes_list, return_list)
     plt.xlabel("Episodes")
     plt.ylabel("Return")
-    plt.title("REINFORCE on {}".format(env_name))
+    plt.title("Actor-Critic on {}".format(env_name))
     plt.show()
     # render agent
     render_agent(env_name, agent)
