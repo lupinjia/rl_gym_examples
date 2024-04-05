@@ -6,25 +6,43 @@ import torch.optim as optim
 class PolicyNetDiscrete(nn.Module):
     def __init__(self, state_dim, hidden_dim, action_dim):
         super(PolicyNetDiscrete, self).__init__()
-        self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
-        self.fc2 = torch.nn.Linear(hidden_dim, action_dim)
-
+        if isinstance(hidden_dim, int):
+            hidden_dim = [hidden_dim]
+        layers = []
+        layers.append(nn.Linear(state_dim, hidden_dim[0]))
+        layers.append(nn.ReLU())
+        for i in range(len(hidden_dim)):
+            if i == len(hidden_dim) - 1:
+                layers.append(nn.Linear(hidden_dim[i], action_dim))
+            else:
+                layers.append(nn.Linear(hidden_dim[i], hidden_dim[i+1]))
+                layers.append(nn.ReLU())
+        layers.append(F.softmax(dim=1))  # discrete action, use softmax as output activation
+        self.net = nn.Sequential(*layers)
+    
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        return F.softmax(self.fc2(x), dim=1)
+        return self.net(x)
 
 class PolicyNetContinuous(nn.Module):
     def __init__(self, state_dim, hidden_dim, action_dim):
         super(PolicyNetContinuous, self).__init__()
-        self.fc1 = torch.nn.Linear(state_dim, hidden_dim)
-        self.fc_mu = torch.nn.Linear(hidden_dim, action_dim)   # mean value of gaussian distribution
-        self.fc_std = torch.nn.Linear(hidden_dim, action_dim)  # standard deviation of gaussian distribution
+        if isinstance(hidden_dim, int):
+            hidden_dim = [hidden_dim]
+        layers = []
+        layers.append(nn.Linear(state_dim, hidden_dim[0]))
+        layers.append(nn.ReLU())
+        for i in range(len(hidden_dim)):
+            if i == len(hidden_dim) - 1:
+                layers.append(nn.Linear(hidden_dim[i], action_dim))
+            else:
+                layers.append(nn.Linear(hidden_dim[i], hidden_dim[i+1]))
+                layers.append(nn.ReLU())
+        self.net = nn.Sequential(*layers)
+        self.std = nn.Parameter(0.1 * torch.ones(action_dim))
     
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        mu = self.fc_mu(x)
-        std = F.softplus(self.fc_std(x))  # ensure std is positive
-        return mu, std
+        mean = self.net(x)
+        return mean, self.std
     
 class REINFORCE:
     def __init__(self, state_dim, hidden_dim, action_dim, learning_rate, gamma,
@@ -53,7 +71,7 @@ class REINFORCE:
             return action.item()  # discrete action, return scalar
         else:
             mu, std = self.policy_net(state)
-            action_dist = torch.distributions.Normal(mu, std)  # Gaussian Distribution
+            action_dist = torch.distributions.Normal(mu, mu*0.0 + std)  # Gaussian Distribution
             action = action_dist.sample()
             return [action.item()]  # continuous action, return vector
 

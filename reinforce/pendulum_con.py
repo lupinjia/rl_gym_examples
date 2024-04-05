@@ -11,9 +11,9 @@ from alg.reinforce import REINFORCE
 # agent hyperparameters
 lr = 1e-4
 gamma = 0.99
-hidden_dim = 128
+hidden_dim = [64, 32]
 # training hyperparameters
-num_episodes = 500
+num_episodes = 1000
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # environment hyperparameters
 env_name = "Pendulum-v1"
