@@ -17,6 +17,13 @@
 
 ## :rocket: 开始使用
 
+### :package:选择版本
+
+选择你想使用的版本:
+- Simple Implementation: 包含每个算法的最简单实现，展示最核心的逻辑和部件。
+
+### :computer:准备环境 & 安装依赖
+
 1. 首先，安装依赖，你可以使用conda或pip安装依赖：
     - conda (推荐)
 

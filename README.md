@@ -18,6 +18,13 @@ This repo records my implementation of RL algorithms while learning, and I hope 
 
 ## :rocket:Getting Started
 
+### :package:Choose Version
+
+Choose the version you want to use:
+- [Simple Implementation]: The simplest implementation of each algorithm, showing the core logic of the algorithm.
+
+### :computer:Prepare the Environment & Install Dependencies
+
 1. First, install the dependencies, you can install dependencies using conda or pip:
     - conda (recommended)
 
