@@ -1,9 +1,15 @@
 # rl_gym_examples
 
-<img src="https://imgur.com/C7jhNYR.gif" width = "200" height = "70" alt="cliff_walking_gif"/>
-<img src="https://imgur.com/s7uDhFJ.gif" width = "200" height = "90" alt="cliff_walking_gif"/>
-<img src="https://imgur.com/Rf580ax.gif" width = "200" height = "100" alt="cliff_walking_gif"/>
-<img src="https://imgur.com/QM8PfKs.gif" width = "200" height = "100" alt="cliff_walking_gif"/>
+<table>
+  <tr>
+    <td><img src="https://imgur.com/C7jhNYR.gif" width = "200" height = "70" alt="cliff_walking_gif"/></td>
+    <td><img src="https://imgur.com/s7uDhFJ.gif" width = "200" height = "90" alt="cartpole_gif"/></td>
+  </tr>
+  <tr>
+    <td><img src="https://imgur.com/Rf580ax.gif" width = "200" height = "100" alt="bipedal_walker_gif"/></td>
+    <td><img src="https://imgur.com/QM8PfKs.gif" width = "200" height = "100" alt="inverted_pendulum_gif"/></td>
+  </tr>
+</table>
 
 这个仓库包含了在OpenAI Gym环境使用Python实现的常见强化学习算法的示例代码。
 
