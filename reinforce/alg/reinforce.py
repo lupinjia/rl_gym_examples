@@ -36,11 +36,13 @@ class REINFORCE:
             self.policy_net = PolicyNetContinuous(state_dim, hidden_dim, action_dim).to(device)
         self.optimizer = torch.optim.Adam(self.policy_net.parameters(),
                                           lr=learning_rate)
+        self.action_dim = action_dim
+        self.state_dim = state_dim
         self.gamma = gamma
         self.device = device
 
     def take_action(self, state):  # randomly sample an action according to the probability distribution
-        state = torch.tensor(state.reshape(1, -1), dtype=torch.float).to(self.device) # 将state再包一层list后转为tensor
+        state = torch.tensor(state, dtype=torch.float).view(1, -1).to(self.device) # 将state再包一层list后转为tensor
                                                                          # 这样就可以得到1*state_dim的tensor
                                                                          # 但这个方法会引起警告UserWarning: Creating a tensor from a list 
                                                                          # of numpy.ndarrays is extremely slow. Please consider converting the
@@ -66,8 +68,8 @@ class REINFORCE:
         self.optimizer.zero_grad()
         for i in reversed(range(len(reward_list))):  # Back to Front, calc G
             reward = reward_list[i]
-            state = torch.tensor(state_list[i].reshape(1, -1),
-                                 dtype=torch.float).to(self.device)
+            state = torch.tensor(state_list[i],
+                                 dtype=torch.float).view(1, -1).to(self.device)
             action = torch.tensor(action_list[i]).view(-1, 1).to(self.device)
             if self.action_type == 'discrete':
                 log_prob = torch.log(self.policy_net(state).gather(1, action))  # calc log probability of action

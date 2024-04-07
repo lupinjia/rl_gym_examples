@@ -15,7 +15,7 @@ gamma = 0.9
 lmbda = 0.9
 hidden_dim = 128
 # training hyperparameters
-num_episodes = 500
+num_episodes = 200
 epochs = 10
 eps = 0.2
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

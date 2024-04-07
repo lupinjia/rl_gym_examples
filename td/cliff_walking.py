@@ -70,7 +70,7 @@ def main(argv):
                     }) 
                 # update progress bar
                 pbar.update(1)
-    # demonstrate the learned policy
+    #---------- demonstrate the learned policy ----------#
     env = gym.make('CliffWalking-v0', render_mode='human')
     obs, _ = env.reset()
     terminated = False

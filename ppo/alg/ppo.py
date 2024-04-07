@@ -43,11 +43,13 @@ class PPODiscrete:
                              # each "batch" has a fixed number of transitions,
                              # a transition consists of (state, action, reward, next_state, done)
         self.eps = eps       # Epsilon, specify the clipping range in PPO-clip
+        self.action_dim = action_dim
+        self.state_dim = state_dim
         self.gamma = gamma
         self.device = device
     
     def take_action(self, state):
-        state = torch.tensor([state], dtype=torch.float).to(self.device)
+        state = torch.tensor(state, dtype=torch.float).view(1, -1).to(self.device)
         action_probs = self.actor(state)
         action = torch.distributions.Categorical(action_probs).sample()
         return action.item()
@@ -55,13 +57,13 @@ class PPODiscrete:
     def update(self, transition_dict):
         # The transition_dict contains a list of transitions for a single episode.
         # Convert transition_dict to tensors
-        states = torch.tensor(transition_dict['states'], 
+        states = torch.tensor(np.array(transition_dict['states']), 
                               dtype=torch.float).to(self.device) # shape: (episode_length, state_dim)
         actions = torch.tensor(transition_dict['actions'], 
                                dtype=torch.long).view(-1, 1).to(self.device) # shape: (episode_length, 1)
         rewards = torch.tensor(transition_dict['rewards'], 
                                dtype=torch.float).view(-1, 1).to(self.device) # shape: (episode_length, 1)
-        next_states = torch.tensor(transition_dict['next_states'], 
+        next_states = torch.tensor(np.array(transition_dict['next_states']), 
                                    dtype=torch.float).to(self.device) # shape: (episode_length, state_dim
         dones = torch.tensor(transition_dict['dones'], 
                              dtype=torch.float).view(-1, 1).to(self.device) # shape: (episode_length, 1)
@@ -95,7 +97,7 @@ class PPODiscrete:
             advantage = delta + gamma * lmbda * advantage # Deltas that are more close to the epsode end will multiply more times gamma and lambda
             advantage_list.append(advantage)
         advantage_list.reverse() # reverse order back to original
-        return torch.tensor(advantage_list, dtype=torch.float)
+        return torch.tensor(np.array(advantage_list), dtype=torch.float)
 
 class PolicyNetContinuous(nn.Module):
     def __init__(self, state_dim, hidden_dim, action_dim):
@@ -129,7 +131,7 @@ class PPOContinuous:
         self.device = device
     
     def take_action(self, state):
-        state = torch.tensor(state.reshape(1, -1), dtype=torch.float).to(self.device)
+        state = torch.tensor(state, dtype=torch.float).view(1, -1).to(self.device)
         mu, sigma = self.actor(state)
         action = torch.distributions.Normal(mu, sigma).sample()
         return action.numpy().reshape(-1)

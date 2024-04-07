@@ -61,8 +61,8 @@ def train_dqn(agent, env, num_episodes, replay_buffer, minimal_size, batch_size,
                 while not terminated and not truncated:
                     # interact with environment
                     # 先得到action或先得到max_q_value都一样，因为这个过程中q_net不更新
-                    action = agent.take_action(obs.reshape(1, -1))
-                    max_q_value = agent.max_q_value(obs.reshape(1, -1))*0.005 + max_q_value*0.995
+                    action = agent.take_action(obs)
+                    max_q_value = agent.max_q_value(obs)*0.005 + max_q_value*0.995
                     max_q_value_list.append(max_q_value) # 保存每个状态的最大Q值
                     action_con = dis_to_con(action, env, action_dim) # convert discrete action to continuous action
                     # print('action:', action, 'action_con:', action_con)
@@ -110,7 +110,7 @@ def main(argv):
     obs, info = env.reset()
     terminated, truncated = False, False
     while not terminated and not truncated:
-        action = agent.take_action(obs.reshape(1, -1))
+        action = agent.take_action(obs)
         action_con = dis_to_con(action, env, action_dim) # convert discrete action to continuous action
         next_obs, rew, terminated, truncated, _ = env.step(action_con)
         env.render()

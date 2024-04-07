@@ -16,6 +16,7 @@ num_episodes = 1000
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # environment hyperparameters
 env_name = "CartPole-v1"
+action_type = "discrete"
 
 def train_on_policy_agent(env, agent, num_episodes):
     # to record episode returns
@@ -74,7 +75,7 @@ def main():
     # create agent
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
-    agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device)
+    agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device, action_type)
     # train agent
     return_list = train_on_policy_agent(env, agent, num_episodes)
     # plot return curve

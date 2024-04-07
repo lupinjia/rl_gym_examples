@@ -49,13 +49,14 @@ class DDPG:
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=critic_lr)
         # hyperparameters
         self.action_dim = action_dim
+        self.state_dim = state_dim
         self.sigma = sigma           # standard deviation of exploration noise(gaussian)
         self.tau = tau               # soft update coefficient
         self.gamma = gamma
         self.device = device
     
     def take_action(self, state):
-        state = torch.FloatTensor([state]).to(self.device)
+        state = torch.FloatTensor(state).view(1, -1).to(self.device)
         action = self.actor(state).item()
         # add exploration noise(gaussian)
         action += self.sigma * np.random.randn(self.action_dim)
@@ -67,10 +68,10 @@ class DDPG:
     
     def update(self, transition_dict):
         # extract data from transition_dict
-        states = torch.FloatTensor(transition_dict['states']).to(self.device)
+        states = torch.FloatTensor(transition_dict['states']).view(-1, self.state_dim).to(self.device)
         actions = torch.FloatTensor(transition_dict['actions']).view(-1, self.action_dim).to(self.device)
         rewards = torch.FloatTensor(transition_dict['rewards']).view(-1, 1).to(self.device)
-        next_states = torch.FloatTensor(transition_dict['next_states']).to(self.device)
+        next_states = torch.FloatTensor(transition_dict['next_states']).view(-1, self.state_dim).to(self.device)
         # print("shape of next_states:", next_states.shape)
         dones = torch.FloatTensor(transition_dict['dones']).view(-1, 1).to(self.device)
         # calculate target Q value
@@ -101,7 +102,7 @@ class ReplayBuffer:
     def sample(self, batch_size):
         transitions = random.sample(self.buffer, batch_size) # return a list of random transitions(tuples)
         states, actions, rewards, next_states, dones = zip(*transitions) # unpack the list
-        return np.array(states), actions, rewards, np.array(next_states), dones
+        return np.array(states), np.array(actions), rewards, np.array(next_states), dones
     
     def size(self):
         return len(self.buffer)

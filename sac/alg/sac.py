@@ -69,12 +69,14 @@ class SAC:
         self.log_alpha.requires_grad = True
         self.log_alpha_optimizer = optim.Adam([self.log_alpha], lr=alpha_lr)
         self.target_entropy = target_entropy
+        self.action_dim = action_dim
+        self.state_dim = state_dim
         self.tau = tau               # soft update coefficient
         self.gamma = gamma
         self.device = device
     
     def take_action(self, state):
-        state = torch.FloatTensor([state]).to(self.device)
+        state = torch.FloatTensor(state).view(1, -1).to(self.device)
         action = self.actor(state)[0]
         return [action.item()]
     
@@ -93,12 +95,12 @@ class SAC:
     
     def update(self, transition_dict):
         # extract data from transition_dict
-        states = torch.FloatTensor(transition_dict['states']).to(self.device)
+        states = torch.FloatTensor(transition_dict['states']).view(-1, self.state_dim).to(self.device)
         actions = torch.FloatTensor(transition_dict['actions']
                                     ).view(-1, 1).to(self.device)
         rewards = torch.FloatTensor(transition_dict['rewards']
                                     ).view(-1, 1).to(self.device)
-        next_states = torch.FloatTensor(transition_dict['next_states']).to(self.device)
+        next_states = torch.FloatTensor(transition_dict['next_states']).view(-1, self.state_dim).to(self.device)
         dones = torch.FloatTensor(transition_dict['dones']
                                   ).view(-1, 1).to(self.device)
         # update critic networks
@@ -143,7 +145,7 @@ class ReplayBuffer:
     def sample(self, batch_size):
         transitions = random.sample(self.buffer, batch_size) # return a list of random transitions(tuples)
         states, actions, rewards, next_states, dones = zip(*transitions) # unpack the list
-        return np.array(states), actions, rewards, np.array(next_states), dones
+        return np.array(states), np.array(actions), rewards, np.array(next_states), dones
     
     def size(self):
         return len(self.buffer)
