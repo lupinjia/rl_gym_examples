@@ -26,9 +26,9 @@ class PolicyNetDiscrete(nn.Module):
 class PolicyNetContinuous(nn.Module):
     def __init__(self, state_dim, hidden_dim, action_dim):
         super(PolicyNetContinuous, self).__init__()
-        if isinstance(hidden_dim, int):
+        if isinstance(hidden_dim, int):  # enable single hidden layer
             hidden_dim = [hidden_dim]
-        layers = []
+        layers = []                      # generate layers according to input list, which contains the number of neurons in each layer
         layers.append(nn.Linear(state_dim, hidden_dim[0]))
         layers.append(nn.ReLU())
         for i in range(len(hidden_dim)):

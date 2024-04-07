@@ -1,5 +1,10 @@
 # rl_gym_examples
 
+<img src="https://imgur.com/C7jhNYR.gif" width = "200" height = "70" alt="cliff_walking_gif"/>
+<img src="https://imgur.com/s7uDhFJ.gif" width = "200" height = "90" alt="cliff_walking_gif"/>
+<img src="https://imgur.com/Rf580ax.gif" width = "200" height = "100" alt="cliff_walking_gif"/>
+<img src="https://imgur.com/QM8PfKs.gif" width = "200" height = "100" alt="cliff_walking_gif"/>
+
 这个仓库包含了在OpenAI Gym环境使用Python实现的常见强化学习算法的示例代码。
 
 这个仓库记录了我在学习过程中实现的RL算法，我希望它能帮助其他人更好地学习和理解RL算法。
