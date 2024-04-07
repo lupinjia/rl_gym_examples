@@ -1,6 +1,8 @@
 # Folder and File Explanation
 
 - **alg**: Contains the implementation of DQN algorithms, including DQN, Double DQN, and Dueling DQN.
+    
+    DQN and Double DQN implementations are in alg/dqn.py, and Dueling DQN implementation is in alg/dueling_dqn.py.
 - **cartpole.py**: DQN training example on the CartPole environment of OpenAI Gymnasium.
 - **pendulum.py**: DQN training example on the Pendulum environment of OpenAI Gymnasium. Note that the Pendulum env has continuous action space, so the DQN algorithm used here adopts a action discretization technique to handle the continuous action space.
 

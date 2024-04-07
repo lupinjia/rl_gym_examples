@@ -49,11 +49,13 @@ class ActorCritic:
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=critic_lr)
         # hyperparameters
         self.action_type = action_type
+        self.action_dim = action_dim
+        self.state_dim = state_dim
         self.gamma = gamma
         self.device = device
     
     def take_action(self, state):
-        state = torch.tensor([state], dtype=torch.float).to(self.device)
+        state = torch.tensor(state, dtype=torch.float).view(1, -1).to(self.device)
         if self.action_type == 'discrete':
             probs = self.actor(state)  # get probabilities of actions
             action_dist = torch.distributions.Categorical(probs)  # create categorical distribution
@@ -66,10 +68,11 @@ class ActorCritic:
             return [action.item()]
     
     def update(self, transition_dict):
-        states = torch.tensor(transition_dict['states'], dtype=torch.float).to(self.device)
+        states = torch.tensor(np.array(transition_dict['states']), dtype=torch.float).view(-1, self.state_dim).to(self.device)
+        # convert list of ndarrays to ndarray, cause converting list of ndarrays to tensor is extremely slow
         actions = torch.tensor(transition_dict['actions'], dtype=torch.long).view(-1, 1).to(self.device)
         rewards = torch.tensor(transition_dict['rewards'], dtype=torch.float).view(-1, 1).to(self.device)
-        next_states = torch.tensor(transition_dict['next_states'], dtype=torch.float).to(self.device)
+        next_states = torch.tensor(np.array(transition_dict['next_states']), dtype=torch.float).view(-1, self.state_dim).to(self.device)
         dones = torch.tensor(transition_dict['dones'], dtype=torch.float).view(-1, 1).to(self.device)
 
         td_target = rewards + self.gamma * self.critic(next_states) * (1 - dones)

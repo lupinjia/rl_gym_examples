@@ -44,7 +44,7 @@ def main(argv):
                 truncated = False
                 while not terminated and not truncated:
                     # interact with environment
-                    action = agent.take_action(obs.reshape(1, -1))
+                    action = agent.take_action(obs)
                     next_obs, rew, terminated, truncated, _ = env.step(action)
                     # add experience to replay buffer
                     replay_buffer.add(obs, action, rew, next_obs, terminated)
@@ -79,7 +79,7 @@ def main(argv):
     obs, info = env.reset()
     terminated, truncated = False, False
     while not terminated and not truncated:
-        action = agent.take_action(obs.reshape(1, -1))
+        action = agent.take_action(obs)
         next_obs, rew, terminated, truncated, _ = env.step(action)
         env.render()
         obs = next_obs    

@@ -1,22 +1,26 @@
-import gymnasium as gym
-import torch
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-import numpy as np
+# Based on the code of Hands-on-RL(https://github.com/boyu-ai/Hands-on-RL/blob/main/)
 
-from alg.actor_critic import ActorCritic
+import gymnasium as gym
+from tqdm import tqdm
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
+
+from alg.ppo import PPOContinuous
 
 # agent hyperparameters
-actor_lr = 1e-3
-critic_lr = 1e-2
+actor_lr = 1e-4
+critic_lr = 1e-3
+gamma = 0.9
+lmbda = 0.9
 hidden_dim = 128
-gamma = 0.98
 # training hyperparameters
-num_episodes = 1000
+num_episodes = 200
+epochs = 10
+eps = 0.2
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # environment hyperparameters
-env_name = "CartPole-v1"
-action_type = "discrete"
+env_name = "BipedalWalker-v3"
 
 def train_on_policy_agent(env, agent, num_episodes):
     # to record episode returns
@@ -67,24 +71,42 @@ def train_on_policy_agent(env, agent, num_episodes):
     # return return_list
     return return_list
 
+def render_agent(env_name, agent):
+    # reset environment
+    env = gym.make(env_name, render_mode="human")
+    agent.eval()
+    state, _ = env.reset()
+    terminated, truncated = False, False
+    while not terminated and not truncated: # interaction loop
+        # select action
+        action = agent.take_action(state)
+        # step the environment
+        next_state, reward, terminated, truncated, _ = env.step(action)
+        # render environment
+        env.render()
+        # update state
+        state = next_state
+
 def main():
     # create environment
     env = gym.make(env_name)
-    # set seeds for reproducibility
+    # set seeds
     torch.manual_seed(0)
     # create agent
     state_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.n
-    agent = ActorCritic(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, device, action_type)
+    action_dim = env.action_space.shape[0]
+    agent = PPOContinuous(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, lmbda, epochs, eps, gamma, device)
     # train agent
     return_list = train_on_policy_agent(env, agent, num_episodes)
     # plot return curve
-    episode_list = np.arange(len(return_list))
-    plt.plot(episode_list, return_list)
-    plt.xlabel("Episode")
+    episodes_list = np.arange(len(return_list))
+    plt.plot(episodes_list, return_list)
+    plt.xlabel("Episodes")
     plt.ylabel("Return")
-    plt.title("Actor-Critic on {}".format(env_name))
+    plt.title("PPO on {}".format(env_name))
     plt.show()
+    # render agent
+    render_agent(env_name, agent)
 
 if __name__ == "__main__":
     main()

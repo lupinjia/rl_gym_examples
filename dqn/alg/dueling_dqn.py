@@ -71,6 +71,7 @@ class DQN:
             self.target_q_net = Qnet(state_dim, hidden_dim, action_dim).to(device)
         # params
         self.action_dim = action_dim
+        self.state_dim = state_dim
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=learning_rate)
         self.gamma = gamma
         self.epsilon = epsilon
@@ -83,25 +84,25 @@ class DQN:
         if np.random.random() < self.epsilon:
             action = np.random.randint(self.action_dim)
         else:
-            state = torch.tensor(state, dtype=torch.float).to(self.device)
+            state = torch.tensor(state, dtype=torch.float).view(1, -1).to(self.device)
             action = self.q_net(state).argmax().item()  # select action with highest Q-value
         return action
 
     def max_q_value(self, state):
         # state: 1 state
-        state = torch.tensor(state, dtype=torch.float, device=self.device)
+        state = torch.tensor(state, dtype=torch.float, device=self.device).view(1, -1)
         return self.q_net(state).max().item() # 直接max()就可以得到标量
     
     def update(self, transition_dict):
         # experience data of a batch
         states = torch.tensor(transition_dict['states'],
-                              dtype=torch.float).to(self.device)
+                              dtype=torch.float).view(-1, self.state_dim).to(self.device)
         actions = torch.tensor(transition_dict['actions']).view(-1, 1).to(
             self.device)
         rewards = torch.tensor(transition_dict['rewards'],
                                dtype=torch.float).view(-1, 1).to(self.device)
         next_states = torch.tensor(transition_dict['next_states'],
-                                   dtype=torch.float).to(self.device)
+                                   dtype=torch.float).view(-1, self.state_dim).to(self.device)
         dones = torch.tensor(transition_dict['dones'],
                              dtype=torch.float).view(-1, 1).to(self.device)
         q_values = self.q_net(states).gather(1, actions) # 遵从gather()的规则取值
