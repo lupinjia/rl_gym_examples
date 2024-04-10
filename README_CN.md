@@ -76,7 +76,7 @@
 - 'dp': 动态规划
 - 'td': 时序差分（TD）学习
 - 'dqn': 深度Q网络（DQN）
-- 'reinforce': REINFORCE算法（或Vanilla策略梯度）
+- 'pg': REINFORCE算法（或Vanilla策略梯度）
 - 'actor_critic': Actor-Critic算法
 - 'ppo': 近端策略优化（PPO）算法
 - 'ddpg': 深度确定性策略梯度（DDPG）算法

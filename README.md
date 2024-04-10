@@ -76,7 +76,7 @@ The pytorch in the dependencies is cpu version, you can install the gpu version 
 - 'dp':  Dynamic Programming
 - 'td':  Temporal Difference (TD) learning
 - 'dqn': Deep Q Network (DQN)
-- 'reinforce': REINFORCE algorithm(or Vanilla Policy Gradient)
+- 'pg': REINFORCE algorithm(or Vanilla Policy Gradient)
 - 'actor_critic': Actor-Critic algorithm
 - 'ppo': Proximal Policy Optimization (PPO) algorithm
 - 'ddpg': Deep Deterministic Policy Gradient (DDPG) algorithm

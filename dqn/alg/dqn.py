@@ -11,6 +11,10 @@ class ReplayBuffer:
         self.buffer = collections.deque(maxlen=capacity)  # double ended queue, FIFO
 
     def add(self, state, action, reward, next_state, done):
+        '''
+        action: 1d numpy array or scalar
+        state, next_state: 1d numpy array
+        '''
         self.buffer.append((state, action, reward, next_state, done))
 
     def sample(self, batch_size):  # sample data from buffer, with size of batch_size
