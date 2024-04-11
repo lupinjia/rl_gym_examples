@@ -69,7 +69,7 @@ class PPODiscrete:
                              dtype=torch.float).view(-1, 1).to(self.device) # shape: (episode_length, 1)
         # Compute advantages
         td_targets = rewards + self.gamma * self.critic(next_states) * (1 - dones)
-        td_delta = td_targets - self.critic(states) # Temporal Difference Error(can also be called advantage in actor-critic)
+        td_delta = td_targets - self.critic(states)  # Temporal Difference Error(can also be called advantage in actor-critic)
         advantage = self.compute_advantage(self.gamma, self.lmbda, td_delta.cpu()).to(self.device) # compute advantage using GAE
         old_log_probs = torch.log(self.actor(states).gather(1, actions)).detach()
 
@@ -94,9 +94,9 @@ class PPODiscrete:
         advantage_list = []
         advantage = 0.0
         for delta in td_delta[::-1]: # reverse order
-            advantage = delta + gamma * lmbda * advantage # Deltas that are more close to the epsode end will multiply more times gamma and lambda
+            advantage = delta + gamma * lmbda * advantage  # Deltas that are more close to the epsode end will multiply more times gamma and lambda
             advantage_list.append(advantage)
-        advantage_list.reverse() # reverse order back to original
+        advantage_list.reverse()  # reverse order back to original
         return torch.tensor(np.array(advantage_list), dtype=torch.float)
 
 class PolicyNetContinuous(nn.Module):
