@@ -89,7 +89,7 @@ class ValueNet(nn.Module):
         return self.net(x)
 
 class A2CDiscrete:
-    def __init__(self, state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, lamda, device):
+    def __init__(self, state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, lamda, entropy_coefficient, device):
         self.actor = PolicyNetDiscrete(state_dim, hidden_dim, action_dim).to(device)
         self.critic = ValueNet(state_dim, hidden_dim).to(device)
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=actor_lr)
@@ -100,6 +100,7 @@ class A2CDiscrete:
         self.state_dim = state_dim
         self.gamma = gamma
         self.lamda = lamda
+        self.entropy_coe = entropy_coefficient
         self.device = device
     
     def update_dist(self, action_probs):
@@ -142,14 +143,20 @@ class A2CDiscrete:
         returns, advantages = self.compute_returns_and_advantages(transition_dict, self.lamda)
         log_probs = torch.log(self.actor(states).gather(1, actions))  # elements in actions must be subscripts to use gather()
         actor_loss = torch.mean(-log_probs * advantages.detach())  # detach()防止梯度传递, 共享数据内存, 值相同
-                                                                 # td_error is not related to actor parameter, can be seen as constant
-        critic_loss = F.mse_loss(self.critic(states), returns.detach())
-        # prepare to update
+                                                                   # td_error is not related to actor parameter, can be seen as constant
+                                                                   # also prevent the gradient accumulation in critic params
+        #----- Adding Entropy Loss -----#
+        self.update_dist(self.actor(states))  # update action distribution
+        entropy = torch.mean(self.action_dist.entropy())
+        entropy_loss = -self.entropy_coe * entropy
+        actor_loss = actor_loss + entropy_loss
+        #----- Adding Entropy Loss -----#
+        critic_loss = F.mse_loss(self.critic(states), returns.detach())  # if not calculate the graident of critic target(returns) w.r.t. 
+                                                                         # critic params, the performance will be slightly better(see curve/comparison_CriticTargetGradient.png)
+        # update actor and critic
         self.actor_optimizer.zero_grad()
-        self.critic_optimizer.zero_grad()
-        # calc gradients
         actor_loss.backward()
-        critic_loss.backward()
-        # update weights
         self.actor_optimizer.step()
+        self.critic_optimizer.zero_grad()
+        critic_loss.backward()
         self.critic_optimizer.step()

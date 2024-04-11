@@ -1,7 +1,6 @@
 import gymnasium as gym
 import torch
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 import numpy as np
 
 from alg.a2c import A2CDiscrete
@@ -13,11 +12,23 @@ critic_lr = 1e-2
 hidden_dim = 128
 gamma = 0.98
 lamda = 0
+entropy_coefficient = 0.01
 # training hyperparameters
-num_episodes = 1000
+num_episodes = 500
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # environment hyperparameters
 env_name = "CartPole-v1"
+
+def render_result(agent):
+    env = gym.make(env_name, render_mode="human")
+    state = env.reset()
+    done = False
+    while not done:
+        env.render()
+        action = agent.select_action(state)
+        next_state, reward, done, _ = env.step(action)
+        state = next_state
+    env.close()
 
 def main():
     # create environment
@@ -27,17 +38,17 @@ def main():
     # create agent
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
-    agent_lamda0 = A2CDiscrete(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, 0, device)
-    agent_lamda1 = A2CDiscrete(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, 1, device)
+    agent1 = A2CDiscrete(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, lamda, 0.01, device)
+    agent2 = A2CDiscrete(state_dim, hidden_dim, action_dim, actor_lr, critic_lr, gamma, lamda, 1, device)
     # create runner
-    runner = OnPolicyRunner(env, agent_lamda0, num_episodes)
-    return_list_lamda0 = runner.run()
-    runner.set_agent(agent_lamda1)
-    return_list_lamda1 = runner.run()
+    runner = OnPolicyRunner(env, agent1, num_episodes)
+    return_list = runner.run()
+    runner.set_agent(agent2)
+    return_list2 = runner.run()
     # plot return curve
-    episode_list = np.arange(len(return_list_lamda0))
-    plt.plot(episode_list, return_list_lamda0, label="$\lambda=0$")
-    plt.plot(episode_list, return_list_lamda1, label="$\lambda=1$")
+    episode_list = np.arange(len(return_list))
+    plt.plot(episode_list, return_list, label="entropy_coe = 0.01")
+    plt.plot(episode_list, return_list2, label="entropy_coe = 1")
     plt.xlabel("Episode")
     plt.ylabel("Return")
     plt.title("Actor-Critic on {}".format(env_name))

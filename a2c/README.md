@@ -12,6 +12,10 @@ You can find more information about Actor-Critic algorithm in the following reso
 - [Hands on RL](https://hrl.boyuai.com/chapter/2/actor-critic%E7%AE%97%E6%B3%95)
 - [EasyRL](https://datawhalechina.github.io/easy-rl/#/chapter9/chapter9)
 
+# Some Implementation Details
+
+- [About the loss and optimizer of A2C Algorithms](https://www.reddit.com/r/reinforcementlearning/comments/1c18roz/about_the_loss_and_optimizer_in_a2c_implementation/)
+
 # Additional Notes
 
 - The provided examples are designed for educational purposes, illustrating the core concepts of TD learning.

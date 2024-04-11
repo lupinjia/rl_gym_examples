@@ -72,7 +72,6 @@ class DDPG:
         actions = torch.FloatTensor(transition_dict['actions']).view(-1, self.action_dim).to(self.device)
         rewards = torch.FloatTensor(transition_dict['rewards']).view(-1, 1).to(self.device)
         next_states = torch.FloatTensor(transition_dict['next_states']).view(-1, self.state_dim).to(self.device)
-        # print("shape of next_states:", next_states.shape)
         dones = torch.FloatTensor(transition_dict['dones']).view(-1, 1).to(self.device)
         # calculate target Q value
         next_q_values = self.target_critic(next_states, self.target_actor(next_states))
