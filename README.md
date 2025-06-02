@@ -30,22 +30,26 @@ Choose the version you want to use:
 
 ### :computer:Prepare the Environment & Install Dependencies
 
-1. First, install the dependencies, you can install dependencies using conda or pip:
-    - conda (recommended)
+1. clone this repository
+   
+   ```Bash
+   git clone git@github.com:lupinjia/rl_gym_examples.git
+   ```
 
-    Create a new conda environment using the yml file:
-    ```Bash
-    conda create -f rl_gym_examples.yml
-    ```
-    - pip
+2. create a new virtual environment with python 3.8
+   
+   ```Bash
+   conda create -n env_name python=3.8
+   ```
 
-    You can also install the dependencies using pip(though it is not recommended):
+3. install the dependencies, you can install dependencies using pip:
     ```Bash
+    pip install swig
     pip install -r requirements.txt
     ```
-    The Python version is 3.8.
 
-2. Then, you can run the examples in the corresponding folders, for example:
+4. Then, you can run the examples in the corresponding folders, for example:
+   
     ```Bash
     cd dp
     python gym_cliff_walking.py
@@ -53,7 +57,7 @@ Choose the version you want to use:
 
 ### :bulb:Tips
 
-The pytorch in the dependencies is cpu version, you can install the gpu version by following the instructions in the [pytorch website](https://pytorch.org/get-started/locally/).
+The pytorch in the dependencies is cpu version by default, you can install the gpu version by following the instructions in the [pytorch website](https://pytorch.org/get-started/locally/).
 
 ## :books:Supported Algorithms
 
